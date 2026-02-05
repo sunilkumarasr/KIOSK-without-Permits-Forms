@@ -503,8 +503,8 @@ public class WorkPermitFormActivity extends AppCompatActivity implements View.On
             jsonObj_.put("sc_mobileData", "");
             jsonObj_.put("sc_mobile", "");
             jsonObj_.put("work_loc", placeOfWorkVisitType);
-            jsonObj_.put("d_start", fromDateTimeStamp);
-            jsonObj_.put("d_end", toDateTimeStamp);
+            jsonObj_.put("d_start", Long.parseLong(fromDateTimeStamp));
+            jsonObj_.put("d_end",Long.parseLong(toDateTimeStamp));
             jsonObj_.put("t_start", fromSelectTime);
             jsonObj_.put("t_end", toSelectTime);
             jsonObj_.put("sc_perwork", "");
@@ -1121,7 +1121,6 @@ public class WorkPermitFormActivity extends AppCompatActivity implements View.On
             imgContractorInfo.setVisibility(View.VISIBLE);
         }
     }
-
 
     //Sub Contractor
     private void AddSubContractorPopUp() {

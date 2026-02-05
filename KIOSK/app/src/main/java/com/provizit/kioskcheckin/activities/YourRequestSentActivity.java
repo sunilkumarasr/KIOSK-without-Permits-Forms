@@ -110,9 +110,7 @@ public class YourRequestSentActivity extends AppCompatActivity implements View.O
             ImageUri = Uri.parse(uri);
             image_set();
         } else if (model.getIncomplete_data().getPic() != null && model.getIncomplete_data().getPic().size() != 0) {
-
             Glide.with(YourRequestSentActivity.this).load(DataManger.IMAGE_URL + "/uploads/" + Comp_id + "/" + model.getIncomplete_data().getPic().get(model.getIncomplete_data().getPic().size() - 1)).into(visitor_img);
-
         } else {
             visitor_img.setImageResource(R.drawable.ic_user_white);
         }

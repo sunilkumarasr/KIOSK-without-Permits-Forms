@@ -138,8 +138,7 @@ public class MaterialPermitActivity extends AppCompatActivity implements View.On
                                                 "[C]\n" +
                                                 "[C]<qrcode size='14'>"+qrData+"</qrcode>\n"
                                 );
-
-
+                                
 //                                Toast.makeText(context, "Print successful!", Toast.LENGTH_SHORT).show();
                                 Intent intents = new Intent(getApplicationContext(), ChekInPermitStatusActivity.class);
                                 intents.putExtra("status", "1");
@@ -149,6 +148,9 @@ public class MaterialPermitActivity extends AppCompatActivity implements View.On
                                      EscPosParserException e) {
                                 e.printStackTrace();
                                 Toast.makeText(context, "Printing failed: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                                Intent intents = new Intent(getApplicationContext(), ChekInPermitStatusActivity.class);
+                                intents.putExtra("status", "1");
+                                startActivity(intents);
                             } catch (EscPosBarcodeException e) {
                                 throw new RuntimeException(e);
                             }
@@ -156,6 +158,9 @@ public class MaterialPermitActivity extends AppCompatActivity implements View.On
                         }
                     } else {
                         Toast.makeText(context, "USB permission denied", Toast.LENGTH_SHORT).show();
+                        Intent intents = new Intent(getApplicationContext(), ChekInPermitStatusActivity.class);
+                        intents.putExtra("status", "1");
+                        startActivity(intents);
                     }
                     unregisterReceiver(this);
                 }
@@ -539,6 +544,9 @@ public class MaterialPermitActivity extends AppCompatActivity implements View.On
             usbManager.requestPermission(usbConnection.getDevice(), permissionIntent);
         } else {
             Toast.makeText(this, "No USB printer connected", Toast.LENGTH_SHORT).show();
+            Intent intents = new Intent(getApplicationContext(), ChekInPermitStatusActivity.class);
+            intents.putExtra("status", "1");
+            startActivity(intents);
         }
     }
 

@@ -409,8 +409,8 @@ public class MaterialPermitFormActivity extends AppCompatActivity implements Vie
         try {
             jsonObj_.put("formtype", "insert");
             jsonObj_.put("type", EntryType);
-            jsonObj_.put("start", fromDateTimeStamp);
-            jsonObj_.put("end", toDateTimeStamp);
+            jsonObj_.put("start", Long.parseLong(fromDateTimeStamp) );
+            jsonObj_.put("end", Long.parseLong(toDateTimeStamp));
 
             if (EntryType.equalsIgnoreCase("1")){
                 jsonObj_.put("ref_document", RefDocItem);

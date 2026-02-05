@@ -237,7 +237,6 @@ public class MeetingRequestFormActivity extends AppCompatActivity implements Vie
         purpose_search.setFilters(filters);
         otherpurpose.setFilters(filters);
 
-
         apiViewModel.getpurposes(getApplicationContext());
         apiViewModel.getsubhierarchys(getApplicationContext(), "", "coordinator");
 
@@ -258,7 +257,7 @@ public class MeetingRequestFormActivity extends AppCompatActivity implements Vie
 //            }
 //            return false;
 //        });
-//
+
 //        editTextEmail.setImeOptions(EditorInfo.IME_ACTION_DONE);
 
         apiViewModel.getResponsecommoncheckuser().observe(this, model1 -> {

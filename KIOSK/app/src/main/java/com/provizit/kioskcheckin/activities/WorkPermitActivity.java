@@ -183,6 +183,12 @@ public class WorkPermitActivity extends AppCompatActivity implements View.OnClic
                                      EscPosParserException e) {
                                 e.printStackTrace();
                                 Toast.makeText(context, "Printing failed: " + e.getMessage(), Toast.LENGTH_LONG).show();
+
+                                Intent intents = new Intent(WorkPermitActivity.this, ChekInPermitStatusActivity.class);
+                                intents.putExtra("status", "1");
+                                intents.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                startActivity(intents);
+
                             } catch (EscPosBarcodeException e) {
                                 throw new RuntimeException(e);
                             }
@@ -190,6 +196,10 @@ public class WorkPermitActivity extends AppCompatActivity implements View.OnClic
                         }
                     } else {
                         Toast.makeText(context, "USB permission denied", Toast.LENGTH_SHORT).show();
+                        Intent intents = new Intent(WorkPermitActivity.this, ChekInPermitStatusActivity.class);
+                        intents.putExtra("status", "1");
+                        intents.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        startActivity(intents);
                     }
                     unregisterReceiver(this);
                 }
@@ -954,6 +964,11 @@ public class WorkPermitActivity extends AppCompatActivity implements View.OnClic
             usbManager.requestPermission(usbConnection.getDevice(), permissionIntent);
         } else {
             Toast.makeText(this, "No USB printer connected", Toast.LENGTH_SHORT).show();
+
+            Intent intents = new Intent(WorkPermitActivity.this, ChekInPermitStatusActivity.class);
+            intents.putExtra("status", "1");
+            intents.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(intents);
         }
     }
 
