@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".activities.PrintActivity">
+    <Button
+        android:id="@+id/printButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Print Entry Pass"
+        android:layout_centerInParent="true"/>
+
+    <WebView
+        android:id="@+id/webView"
+        android:layout_width="1px"
+        android:layout_height="1px"
+        android:visibility="gone"/>
+</RelativeLayout>
