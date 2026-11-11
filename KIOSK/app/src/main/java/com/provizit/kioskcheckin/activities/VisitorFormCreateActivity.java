@@ -2,6 +2,7 @@ package com.provizit.kioskcheckin.activities;
 
 import static android.view.View.GONE;
 import static com.provizit.kioskcheckin.logins.AdminLoginActivity.isEmailValid;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.res.ResourcesCompat;
@@ -11,6 +12,7 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
 import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.BroadcastReceiver;
@@ -49,6 +51,7 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import com.bumptech.glide.Glide;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.gson.Gson;
@@ -74,6 +77,7 @@ import com.provizit.kioskcheckin.api.DataManger;
 import com.provizit.kioskcheckin.services.GetCVisitorDetailsModel;
 import com.provizit.kioskcheckin.services.GetNdaActiveDetailsModel;
 import com.provizit.kioskcheckin.services.GetnationalityModel;
+import com.provizit.kioskcheckin.services.Invite;
 import com.provizit.kioskcheckin.services.Privacypolicymodel;
 import com.provizit.kioskcheckin.services.VcheckuserModel;
 import com.provizit.kioskcheckin.services.VisitorformDetailsModel;
@@ -85,11 +89,13 @@ import com.provizit.kioskcheckin.utilities.MobileDataAddress;
 import com.provizit.kioskcheckin.config.Preferences;
 import com.provizit.kioskcheckin.utilities.Vehicles;
 import com.provizit.kioskcheckin.utilities.VisitorFormDetailsOtherArray;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Type;
@@ -97,6 +103,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
+
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -129,6 +136,8 @@ public class VisitorFormCreateActivity extends AppCompatActivity implements View
     Getdocuments getdocuments;
     Getdocuments getDocumentss;
     GetCVisitorDetailsModel model;
+    Invite invite_details;
+    Float meeting_status = 0.0f;
     String Id_numberkeyboard_type = "";
     Privacypolicymodel privicymodel;
     LinearLayout linaer_p, linear_checkbox_selection;
@@ -203,6 +212,7 @@ public class VisitorFormCreateActivity extends AppCompatActivity implements View
         ndamodel = new GetNdaActiveDetailsModel();
         Intent intent = getIntent();
         model = (GetCVisitorDetailsModel) intent.getSerializableExtra("model_key");
+        meeting_status = model.getItems().getMeetingStatus();
 
         apiViewModel = new ViewModelProvider(VisitorFormCreateActivity.this).get(ApiViewModel.class);
         //Nda active details
@@ -334,6 +344,7 @@ public class VisitorFormCreateActivity extends AppCompatActivity implements View
             documents_list = model.getItems();
             documents = new ArrayList<>();
             documents.clear();
+            int ii = 1;
             try {
                 if (documents_list != null && documents_list.size() > 0) {
                     for (int i = 0; i < documents_list.size(); i++) {
@@ -361,6 +372,41 @@ public class VisitorFormCreateActivity extends AppCompatActivity implements View
                             document_search.setAdapter(invitesadapter);
                         }
 
+                        if (meeting_status == 1) {
+                            Intent intent1 = getIntent();
+                            Invite inviteDetails = (Invite) intent1.getSerializableExtra("invite_key");
+                            if (inviteDetails != null && inviteDetails.getId_type() != null && i == Integer.parseInt(inviteDetails.getId_type())) {
+                                ii = i;
+                            }
+                        }
+
+                    }
+
+                    if (meeting_status == 1) {
+                        Intent intent1 = getIntent();
+                        Invite inviteDetails = (Invite) intent1.getSerializableExtra("invite_key");
+                        if (inviteDetails != null && inviteDetails.getId_type() != null && ii==Integer.parseInt(inviteDetails.getId_type())) {
+                            document_search.setText(documents_list.get(ii).getName(), false);
+                            getDocumentss = documents.get(ii);
+                            for (int i = 0; i < documents_list.size(); i++) {
+                                if (getDocumentss.get_id().get$oid().equals(documents_list.get(i).get_id().get$oid())) {
+                                    doc = i;
+                                    docId = documents_list.get(i).get_id().get$oid();
+                                }
+                            }
+
+                                if (getDocumentss.getCommon() != null && getDocumentss.getCommon()) {
+                                    countryList();
+                                } else {
+                                    apiViewModel.getnationality(getApplicationContext(), docId);
+                                }
+                                if (getDocumentss.getDoc_type() != null && getDocumentss.getDoc_type()) {
+                                    Id_numberkeyboard_type = "numbers";
+                                } else {
+                                    Id_numberkeyboard_type = "text";
+                                }
+                                nationality_search.setVisibility(View.VISIBLE);
+                        }
                     }
                 }
             } catch (Exception e) {
@@ -420,12 +466,19 @@ public class VisitorFormCreateActivity extends AppCompatActivity implements View
                         nationality_search.setThreshold(0);
                         nationality_search.setAdapter(invitesadapter);
                     }
+                    if (meeting_status == 1) {
+
+                        Intent intent = getIntent();
+                        Invite inviteDetails = (Invite) intent.getSerializableExtra("invite_key");
+                        if (inviteDetails != null && inviteDetails.getNationality() != null) {
+                            nationality_search.setText(inviteDetails.getNationality(), false);
+                        }
+                    }
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
             }
         });
-
         document_search.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
@@ -785,11 +838,45 @@ public class VisitorFormCreateActivity extends AppCompatActivity implements View
                 liner_ccp.setLayoutDirection(View.LAYOUT_DIRECTION_LTR);
 
             }
+
+            if (meeting_status == 1) {
+                Intent intent = getIntent();
+                Invite invite_details = (Invite) intent.getSerializableExtra("invite_key");
+
+                if (invite_details != null) {
+                    String invitedNationality = invite_details.getNationality();
+
+//                    Log.e("dataMobile",invite_details.getId_type()+"");
+                    Log.e("dataMobile",invite_details.getMobile()+"");
+//                    Log.e("dataMobile",invite_details.getIdnumber()+"");
+                    String nMobile = invite_details.getMobile().trim()+"";
+                    String countryCode = invite_details.getMobile().substring(0,4);
+                    String mobileN = nMobile.substring(4);
+                    mobile.setText(mobileN);
+                    email.setText(invite_details.getEmail().trim());
+                    e_pname.setText(invite_details.getName());
+
+                    nationality = invitedNationality == null ? "" : invitedNationality;
+                    nationality_search.setText(nationality, false);
+
+                    boolean isSaudi = nationality.equalsIgnoreCase("الالعربية السعودية")
+                            || nationality.equalsIgnoreCase("سعودي")
+                            || nationality.equalsIgnoreCase("Saudi")
+                            || nationality.equalsIgnoreCase("SaudiArabia")
+                            || nationality.equalsIgnoreCase("Saudi Arabia");
+
+                    Id_number.setFilters(new InputFilter[]{
+                            new InputFilter.LengthFilter(isSaudi ? 10 : 30)
+                    });
+                    Id_number.setVisibility(View.VISIBLE);
+                    Id_number.setText(invite_details.getIdnumber() == null
+                            ? "" : invite_details.getIdnumber());
+                }
+            }
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
-
     //mobile length for country code bases logic
     private int getMaxLengthForCountryCode(String countryCode) {
         if (ccp.getSelectedCountryCode().length() == 3) {
@@ -851,8 +938,7 @@ public class VisitorFormCreateActivity extends AppCompatActivity implements View
                 } else if (!mobile.getText().toString().trim().matches(regexStr)) {
                     mobile.requestFocus();
                     mobile.setError("Enter valid mobile");
-                }
-                else if (document_search.getText().length() == 0 && nationalityActive) {
+                } else if (document_search.getText().length() == 0 && nationalityActive) {
                     document_search.requestFocus();
                     document_search.setError("Please select ID type");
                 } else if (nationality.equals("") && nationalityActive) {
@@ -1044,10 +1130,10 @@ public class VisitorFormCreateActivity extends AppCompatActivity implements View
                     if (model.getItem() != null) {
                         for (int i = 0; i < model.getItem().getOther().size(); i++) {
 
-                            if (model.getItem().getOther().get(i).getModel().equalsIgnoreCase("nation")){
-                                nationalityStatus =  model.getItem().getOther().get(i).getStatus();
-                                nationalityActive =  model.getItem().getOther().get(i).getActive();
-                                if (nationalityStatus){
+                            if (model.getItem().getOther().get(i).getModel().equalsIgnoreCase("nation")) {
+                                nationalityStatus = model.getItem().getOther().get(i).getStatus();
+                                nationalityActive = model.getItem().getOther().get(i).getActive();
+                                if (nationalityStatus) {
                                     document_search.setVisibility(View.VISIBLE);
                                 }
                             }
@@ -1242,7 +1328,6 @@ public class VisitorFormCreateActivity extends AppCompatActivity implements View
             ex.printStackTrace();
         }
     }
-
     public void countryList() {
         String jsonFileString = getJsonFromAssets(getApplicationContext(), "countrycodes.json");
         Gson gson = new Gson();
@@ -1259,10 +1344,16 @@ public class VisitorFormCreateActivity extends AppCompatActivity implements View
                 nationality_search.setThreshold(0);
                 nationality_search.setAdapter(invitesadapter);
             }
+        }
 
+        if (meeting_status == 1) {
+            Intent intent = getIntent();
+            Invite inviteDetails = (Invite) intent.getSerializableExtra("invite_key");
+            if (inviteDetails != null && inviteDetails.getNationality() != null) {
+                nationality_search.setText(inviteDetails.getNationality(), false);
+            }
         }
     }
-
     private void privacypolicypopup() {
 
         final Dialog dialog = new Dialog(VisitorFormCreateActivity.this);
@@ -1469,6 +1560,7 @@ public class VisitorFormCreateActivity extends AppCompatActivity implements View
 
         bottomSheetDialog.show();
     }
+
     private void exitPopUp() {
         final Dialog dialog = new Dialog(VisitorFormCreateActivity.this);
         dialog.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM);

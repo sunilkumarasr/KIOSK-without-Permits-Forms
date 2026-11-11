@@ -57,6 +57,7 @@ import com.provizit.kioskcheckin.api.DataManger;
 import com.provizit.kioskcheckin.services.GetCVisitorDetailsModel;
 import com.provizit.kioskcheckin.services.GetNdaActiveDetailsModel;
 import com.provizit.kioskcheckin.config.Preferences;
+import com.provizit.kioskcheckin.services.Invite;
 import com.provizit.kioskcheckin.utilities.GetvisitorrequestblocklistModel;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -81,6 +82,7 @@ public class OTPActivity extends AppCompatActivity implements View.OnClickListen
     String email_mobile_type = "";
     GetNdaActiveDetailsModel ndamodel;
     GetCVisitorDetailsModel model;
+    Invite invite_details;
     ArrayList<String> Nationalitsblaclklist;
     String Nationblacklist = "";
     String Comp_id = "";
@@ -287,6 +289,30 @@ public class OTPActivity extends AppCompatActivity implements View.OnClickListen
                                         String location_id = Preferences.loadStringValue(getApplicationContext(), Preferences.location_id, "");
                                         if (detailmodel.getItems().getLocation() != null) {
 
+                                            String enteredEmail_mobile = "";
+                                            if (email_mobile_type.equals("email")){
+                                                enteredEmail_mobile = model.getIncomplete_data().getEmail();
+                                            }else{
+                                                enteredEmail_mobile = model.getIncomplete_data().getMobile();
+                                            }
+                                            boolean isMatched = false;
+                                            for (Invite invite : detailmodel.getItems().getInvites()) {
+                                                if (email_mobile_type.equals("email")) {
+                                                    if (invite.getEmail() != null &&
+                                                            invite.getEmail().trim().equalsIgnoreCase(enteredEmail_mobile)) {
+                                                        invite_details = invite;
+                                                        isMatched = true;
+                                                        break;
+                                                    }
+                                                }else{
+                                                    if (invite.getMobile() != null &&
+                                                            invite.getMobile().trim().equalsIgnoreCase(enteredEmail_mobile)) {
+                                                        invite_details = invite;
+                                                        isMatched = true;
+                                                        break;
+                                                    }
+                                                }
+                                            }
                                             //meeting date
                                             long meetingMilli8 = (detailmodel.getItems().getDate() + Conversions.timezone()) * 1000;
                                             String meetingdate = Conversions.millitodateD(meetingMilli8);
@@ -295,7 +321,7 @@ public class OTPActivity extends AppCompatActivity implements View.OnClickListen
                                             Locale locale = new Locale(DataManger.appLanguage);
                                             SimpleDateFormat sdf = new SimpleDateFormat("dd MMM yyyy", locale);
                                             String currentDate = sdf.format(new Date());
-                                            System.out.println(currentDate);
+                                            //System.out.println(currentDate);
 
                                             if (!location_id.equalsIgnoreCase(detailmodel.getItems().getLocation())) {
                                                 Intent intent = new Intent(getApplicationContext(), LocationValidationMeetingActivity.class);
@@ -346,8 +372,10 @@ public class OTPActivity extends AppCompatActivity implements View.OnClickListen
                                                                 intent.putExtra("model_key", model);
                                                                 startActivity(intent);
                                                             } else if (meeting_status == 1 && visitor_status == 0) {
+//                                                                Log.e("INVITEEDETAILS::",invite_details+"");
                                                                 Intent intent = new Intent(getApplicationContext(), VisitorFormCreateActivity.class);
                                                                 intent.putExtra("model_key", model);
+                                                                intent.putExtra("invite_key", invite_details);
                                                                 startActivity(intent);
                                                             } else if (visitor_status == 0) {
                                                                 Intent intent1 = new Intent(getApplicationContext(), VisitorFormCreateActivity.class);
@@ -417,6 +445,7 @@ public class OTPActivity extends AppCompatActivity implements View.OnClickListen
                                                     } else if (meeting_status == 1 && visitor_status == 0) {
                                                         Intent intent = new Intent(getApplicationContext(), VisitorFormCreateActivity.class);
                                                         intent.putExtra("model_key", model);
+                                                        intent.putExtra("invite_key", invite_details);
                                                         startActivity(intent);
                                                     } else if (visitor_status == 0) {
                                                         Intent intent1 = new Intent(getApplicationContext(), VisitorFormCreateActivity.class);
@@ -494,6 +523,7 @@ public class OTPActivity extends AppCompatActivity implements View.OnClickListen
                                         } else if (meeting_status == 1 && visitor_status == 0) {
                                             Intent intent = new Intent(getApplicationContext(), VisitorFormCreateActivity.class);
                                             intent.putExtra("model_key", model);
+                                            intent.putExtra("invite_key", invite_details);
                                             startActivity(intent);
                                         } else if (visitor_status == 0) {
                                             Intent intent1 = new Intent(getApplicationContext(), VisitorFormCreateActivity.class);
@@ -569,6 +599,7 @@ public class OTPActivity extends AppCompatActivity implements View.OnClickListen
                                 } else if (meeting_status == 1 && visitor_status == 0) {
                                     Intent intent = new Intent(getApplicationContext(), VisitorFormCreateActivity.class);
                                     intent.putExtra("model_key", model);
+                                    intent.putExtra("invite_key", invite_details);
                                     startActivity(intent);
                                 } else if (visitor_status == 0) {
                                     Intent intent1 = new Intent(getApplicationContext(), VisitorFormCreateActivity.class);

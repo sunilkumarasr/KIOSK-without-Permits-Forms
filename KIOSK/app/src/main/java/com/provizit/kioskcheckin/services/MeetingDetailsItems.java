@@ -1,12 +1,22 @@
 package com.provizit.kioskcheckin.services;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 
 public class MeetingDetailsItems implements Serializable {
 
     private long date;
     private String location;
     private String status;
+    private ArrayList<Invite> invites;
+
+    public ArrayList<Invite> getInvites() {
+        return invites;
+    }
+
+    public void setInvites(ArrayList<Invite> invites) {
+        this.invites = invites;
+    }
 
     public long getDate() {
         return date;
